@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+prometheus_client
+loguru
+pydantic
+python-multipart

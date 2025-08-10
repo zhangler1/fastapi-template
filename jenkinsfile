@@ -1,0 +1,100 @@
+pipeline {
+    agent any  // 使用任意可用的Jenkins代理
+    
+    environment {
+        // 定义环境变量
+        APP_NAME = "my-fastapi-app"
+        // 镜像标签：构建号-短提交哈希
+        IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(8)}"
+    }
+    
+    stages {
+        stage('拉取代码') {
+            steps {
+                echo "从Git仓库拉取最新代码..."
+                // 替换为你的Git仓库地址
+                git url: 'https://github.com/your-username/your-repo.git', 
+                    branch: 'main'
+            }
+        }
+        
+        stage('安装依赖') {
+            steps {
+                echo "安装Python依赖..."
+                sh '''
+                    # 创建虚拟环境
+                    python -m venv venv
+                    # 激活虚拟环境
+                    source venv/bin/activate
+                    # 安装依赖
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+        
+        stage('运行测试') {
+            steps {
+                echo "执行自动化测试..."
+                sh '''
+                    source venv/bin/activate
+                    # 运行测试并生成报告
+                    pytest tests/ -v --junitxml=report.xml
+                '''
+            }
+            post {
+                always {
+                    // 归档测试报告
+                    junit 'report.xml'
+                }
+            }
+        }
+        
+        stage('构建Docker镜像') {
+            steps {
+                echo "开始构建Docker镜像..."
+                sh "docker build -t ${APP_NAME}:${IMAGE_TAG} ."
+                
+                // 可选：给镜像打上latest标签
+                sh "docker tag ${APP_NAME}:${IMAGE_TAG} ${APP_NAME}:latest"
+                
+                // 显示构建的镜像
+                sh "docker images | grep ${APP_NAME}"
+            }
+        }
+        
+        stage('推送镜像（可选）') {
+            steps {
+                echo "推送镜像到仓库..."
+                // 这里以Docker Hub为例，需提前在Jenkins配置凭证
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh '''
+                        docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                        docker tag ${APP_NAME}:${IMAGE_TAG} ${DOCKER_USERNAME}/${APP_NAME}:${IMAGE_TAG}
+                        docker tag ${APP_NAME}:latest ${DOCKER_USERNAME}/${APP_NAME}:latest
+                        docker push ${DOCKER_USERNAME}/${APP_NAME}:${IMAGE_TAG}
+                        docker push ${DOCKER_USERNAME}/${APP_NAME}:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo "CI/CD流程成功完成！镜像: ${APP_NAME}:${IMAGE_TAG}"
+            // 可选：发送成功通知
+            // slackSend channel: '#dev-team', message: "构建成功: ${APP_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "CI/CD流程失败！"
+            // 可选：发送失败通知
+        }
+        always {
+            // 可选：清理工作
+            sh "docker system prune -f"
+        }
+    }
+}
+    
