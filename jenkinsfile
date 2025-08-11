@@ -15,7 +15,7 @@ pipeline {
                 // 替换为你的Git仓库地址
                 git url: 'git@github.com:zhangler1/fastapi-template.git', 
                     branch: 'main',
-                    credentialsId: 'github-ssh-cred' 
+                    credentialsId: 'github-ssh-cred'
             }
         }
         
