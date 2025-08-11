@@ -14,7 +14,8 @@ pipeline {
                 echo "从Git仓库拉取最新代码..."
                 // 替换为你的Git仓库地址
                 git url: 'git@github.com:zhangler1/fastapi-template.git', 
-                    branch: 'main'
+                    branch: 'main',
+                    credentialsId: 'github-ssh-cred' 
             }
         }
         
