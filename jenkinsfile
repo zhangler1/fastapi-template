@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo "从Git仓库拉取最新代码..."
                 // 替换为你的Git仓库地址
-                git url: 'https://github.com/your-username/your-repo.git', 
+                git url: 'git@github.com:zhangler1/fastapi-template.git', 
                     branch: 'main'
             }
         }
