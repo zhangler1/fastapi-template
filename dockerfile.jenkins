@@ -1,0 +1,25 @@
+# 基于官方Jenkins LTS镜像
+FROM jenkins/jenkins:lts
+
+# 切换到root用户以执行安装命令（Jenkins默认用户是jenkins，无管理员权限）
+USER root
+
+# 安装Python3及相关工具
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        python3-venv \
+        python3-dev && \
+    # 清理缓存，减小镜像体积
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 验证Python安装
+RUN python3 --version && \
+    pip3 --version
+
+
+
+# 切换回jenkins用户（遵循容器安全最佳实践）
+USER jenkins
