@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo "执行自动化测试..."
                 sh '''
-                    source venv/bin/activate
+                    . venv/bin/activate
                     # 运行测试并生成报告
                     pytest tests/ -v --junitxml=report.xml
                 '''
