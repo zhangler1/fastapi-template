@@ -24,10 +24,9 @@ pipeline {
                 echo "安装Python依赖..."
                 sh '''
                     # 创建虚拟环境
-                    #!/bin/bash
                     python3 -m venv venv
                     # 激活虚拟环境
-                    source venv/bin/activate
+                    . venv/bin/activate
                     # 安装依赖
                     pip3 install --upgrade pip
                     pip3 install -r requirements.txt
