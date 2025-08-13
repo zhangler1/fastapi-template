@@ -14,6 +14,6 @@ def test_health_check():
 
 def test_root_endpoint():
     """测试根路径接口"""
-    response = client.get("/generate")
+    response = client.post("/generate", json={"prompt": "你好"})
     assert response.status_code == 200
-    
+    assert "message" in response.json()
