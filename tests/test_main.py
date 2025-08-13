@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 # 假设你的主应用文件是app/main.py
-from ..app.main import app
+from app.main import app
  
 
  
