@@ -86,20 +86,7 @@ pipeline {
         }
     }
     
-    post {
-        success {
-            echo "CI/CD流程成功完成！镜像: ${APP_NAME}:${IMAGE_TAG}"
-            // 可选：发送成功通知
-            // slackSend channel: '#dev-team', message: "构建成功: ${APP_NAME}:${IMAGE_TAG}"
-        }
-        failure {
-            echo "CI/CD流程失败！"
-            // 可选：发送失败通知
-        }
-        always {
-            // 可选：清理工作
-            sh "docker system prune -f"
-        }
-    }
+
+
 }
     
